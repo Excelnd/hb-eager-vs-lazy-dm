@@ -3,12 +3,13 @@ package com.ihscode.hibernate.d;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 
 import com.ihscode.hibernate.d.entity.Course;
 import com.ihscode.hibernate.d.entity.Instructor;
 import com.ihscode.hibernate.d.entity.InstructorDetail;
 
-public class EagerLazyDm {
+public class FetchJoinDm {
 
 	public static void main(String[] args) {
 
@@ -29,16 +30,24 @@ public class EagerLazyDm {
 			// start a transaction
 			session.beginTransaction();
 			
+			// option 2: Hibernate query with HQL
+			
 			// get the instructor from db
 			int theId = 1;
-			Instructor tempInstructor = session.get(Instructor.class, theId);
+
+			Query<Instructor> query =
+					session.createQuery("select i from Instructor i "
+							+ "JOIN FETCH i.courses "
+							+ "where i.id=:theInstructorId",
+							Instructor.class);
 			
+			// set parameter on query
+			query.setParameter("theInstructorId", theId);
 			
+			// execute query and get instructor
+			Instructor tempInstructor = query.getSingleResult();
+									
 			System.out.println("ihs2code: Instructor: " + tempInstructor);
-			
-			// get courses for the instructor
-			System.out.println("ihs2code: Courses: " + tempInstructor.getCourses());
-				
 			
 			// commit transaction
 			session.getTransaction().commit();
@@ -46,7 +55,7 @@ public class EagerLazyDm {
 			// close the session
 			session.close();
 			
-			// option 1: call getter method while session is open
+			System.out.println("\nihs2code: The session is now closed!\n");
 			
 			// get courses for the instructor
 			System.out.println("ihs2code: Courses: " + tempInstructor.getCourses());
