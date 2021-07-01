@@ -52,7 +52,7 @@ public class FetchJoinDm {
 			// commit transaction
 			session.getTransaction().commit();
 			
-			// close the session
+			// close the session 
 			session.close();
 			
 			System.out.println("\nihs2code: The session is now closed!\n");
